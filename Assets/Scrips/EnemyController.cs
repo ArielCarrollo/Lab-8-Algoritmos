@@ -20,7 +20,7 @@ public class EnemyController : MonoBehaviour
      {
       if (collision.gameObject.tag == "Node")
          {
-                objective = collision.gameObject.GetComponent<NodeController>().SelecNodeRandom().gameObject;
+            objective = collision.gameObject.GetComponent<NodeController>().SelectNodeRandom();
             energy -= collision.gameObject.GetComponent<NodeController>().energyCost;
             if (energy <= 0)
             {

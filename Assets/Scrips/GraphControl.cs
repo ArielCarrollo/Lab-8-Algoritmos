@@ -1,60 +1,86 @@
 using System.Collections;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using UnityEngine;
 
 public class GraphControl : MonoBehaviour
 {
     public GameObject Nodeprefab;
     public TextAsset NodePositiontext;
-    public string[] arrayNodePosition;
-    public string[] currentNodePositions;
-
-    public List<GameObject> allnodes;
-    public TextAsset nodeConectiontxt;
-    public string[] arrayNodeConection;
-    public string[] CurrentNodeConextions;
+    public TextAsset nodeConnectiontxt;
     public EnemyController Enemy;
+
+    private SimplyLinkedList<GameObject> allNodes = new SimplyLinkedList<GameObject>();
+
     void Start()
     {
-        createnode();
-        CreateConections();
-        selecInitialNode();
-        allnodes[2].GetComponent<NodeController>().energyCost = 3f;
-        allnodes[3].GetComponent<NodeController>().energyCost = 5f;
+        CreateNodes();
+        CreateConnections();
+        SelectInitialNode();
+        ModifyNodeCost();
     }
-    void createnode()
+
+    void CreateNodes()
     {
         if (NodePositiontext != null)
         {
-            arrayNodePosition = NodePositiontext.text.Split('\n');
-            for (int i = 0; i < arrayNodePosition.Length; i++)
+            string[] arrayNodePosition = NodePositiontext.text.Split('\n');
+            foreach (string nodePosition in arrayNodePosition)
             {
-                currentNodePositions = arrayNodePosition[i].Split(',');
-                Vector2 positionn = new Vector2(float.Parse(currentNodePositions[0]), float.Parse(currentNodePositions[1]));
-                GameObject tmp = Instantiate(Nodeprefab, positionn, transform.rotation);
-                allnodes.Add(tmp);
+                string[] coordinates = nodePosition.Split(',');
+                Vector2 position = new Vector2(float.Parse(coordinates[0]), float.Parse(coordinates[1]));
+                GameObject newNode = Instantiate(Nodeprefab, position, Quaternion.identity);
+                allNodes.InsertNodeAtEnd(newNode);
             }
         }
     }
-    void CreateConections()
-    {
-        if (nodeConectiontxt != null)
-        {
-            arrayNodeConection = nodeConectiontxt.text.Split('\n');
-            for (int i = 0; i < arrayNodeConection.Length; i++)
-            {
-                CurrentNodeConextions = arrayNodeConection[i].Split(',');
-                for (int j = 0; j < CurrentNodeConextions.Length; ++j)
-                {
-                    allnodes[i].GetComponent<NodeController>().AddjacentNode(allnodes[int.Parse(CurrentNodeConextions[j])].GetComponent<NodeController>());
-                }
-            }
 
+    void CreateConnections()
+    {
+        if (nodeConnectiontxt != null)
+        {
+            string[] arrayNodeConnections = nodeConnectiontxt.text.Split('\n');
+            int index = 0;
+            foreach (string connections in arrayNodeConnections)
+            {
+                string[] connectedNodes = connections.Split(',');
+                foreach (string connectedNodeIndex in connectedNodes)
+                {
+                    int connectedIndex = int.Parse(connectedNodeIndex);
+                    if (connectedIndex != index && connectedIndex < allNodes.length)
+                    {
+                        GameObject currentNode = allNodes.ObtainNodeAtPosition(index);
+                        GameObject connectedNode = allNodes.ObtainNodeAtPosition(connectedIndex);
+                        currentNode.GetComponent<NodeController>().AddAdjacentNode(connectedNode);
+                    }
+                }
+                index++;
+            }
         }
     }
-    void selecInitialNode()
+
+    void SelectInitialNode()
     {
-        int index = Random.Range(0, allnodes.Count);
-        Enemy.objective = allnodes[index];
+        if (allNodes.length > 0)
+        {
+            int index = Random.Range(0, allNodes.length);
+            Enemy.objective = allNodes.ObtainNodeAtPosition(index);
+        }
+        else
+        {
+            Debug.LogWarning("No se han creado nodos para seleccionar uno inicialmente.");
+        }
+    }
+
+    void ModifyNodeCost()
+    {
+        if (allNodes.length >= 4)
+        {
+            allNodes.ObtainNodeAtPosition(2).GetComponent<NodeController>().energyCost = 3f;
+            allNodes.ObtainNodeAtPosition(3).GetComponent<NodeController>().energyCost = 5f;
+        }
+        else
+        {
+            Debug.LogWarning("No hay suficientes nodos para modificar los costos de energía.");
+        }
     }
 }
