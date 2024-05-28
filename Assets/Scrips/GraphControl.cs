@@ -39,21 +39,22 @@ public class GraphControl : MonoBehaviour
         if (nodeConnectiontxt != null)
         {
             string[] arrayNodeConnections = nodeConnectiontxt.text.Split('\n');
-            int index = 0;
-            foreach (string connections in arrayNodeConnections)
+            for (int i = 0; i < arrayNodeConnections.Length; i++)
             {
+                string connections = arrayNodeConnections[i];
                 string[] connectedNodes = connections.Split(',');
-                foreach (string connectedNodeIndex in connectedNodes)
+
+                int currentIndex = i; 
+                for (int j = 0; j < connectedNodes.Length; j++)
                 {
-                    int connectedIndex = int.Parse(connectedNodeIndex);
-                    if (connectedIndex != index && connectedIndex < allNodes.length)
+                    int connectedIndex = int.Parse(connectedNodes[j]);
+                    if (connectedIndex != currentIndex && connectedIndex < allNodes.length)
                     {
-                        GameObject currentNode = allNodes.ObtainNodeAtPosition(index);
+                        GameObject currentNode = allNodes.ObtainNodeAtPosition(currentIndex);
                         GameObject connectedNode = allNodes.ObtainNodeAtPosition(connectedIndex);
                         currentNode.GetComponent<NodeController>().AddAdjacentNode(connectedNode);
                     }
                 }
-                index++;
             }
         }
     }

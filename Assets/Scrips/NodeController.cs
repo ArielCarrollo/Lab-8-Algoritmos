@@ -14,13 +14,15 @@ public class NodeController : MonoBehaviour
 
     public GameObject SelectNodeRandom()
     {
-        if (adjacentNodes.length == 0)
+        if (adjacentNodes == null || adjacentNodes.length == 0)
         {
             return null; 
         }
         else
         {
-            return adjacentNodes.GetRandomNode();
+            int index = UnityEngine.Random.Range(0, adjacentNodes.length);
+            return adjacentNodes.ObtainNodeAtPosition(index);
         }
     }
 }
+
