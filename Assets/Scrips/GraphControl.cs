@@ -4,55 +4,54 @@ using UnityEngine;
 
 public class GraphControl : MonoBehaviour
 {
-    public GameObject Nodeprefab;
-    public TextAsset NodePositiontext;
-    public TextAsset nodeConnectiontxt;
+    public GameObject NodePrefab;
+    public TextAsset NodePositionText;
+    public TextAsset NodeConnectionText;
     public EnemyController Enemy;
 
-    private SimplyLinkedList<GameObject> allNodes = new SimplyLinkedList<GameObject>();
+    private NodeController[] allNodes;
 
     void Start()
     {
         CreateNodes();
         CreateConnections();
         SelectInitialNode();
-        ModifyNodeCost();
+       
     }
 
     void CreateNodes()
     {
-        if (NodePositiontext != null)
+        if (NodePositionText != null)
         {
-            string[] arrayNodePosition = NodePositiontext.text.Split('\n');
-            foreach (string nodePosition in arrayNodePosition)
+            string[] nodePositions = NodePositionText.text.Split('\n');
+            allNodes = new NodeController[nodePositions.Length];
+            for (int i = 0; i < nodePositions.Length; i++)
             {
-                string[] coordinates = nodePosition.Split(',');
-                Vector2 position = new Vector2(float.Parse(coordinates[0]), float.Parse(coordinates[1]));
-                GameObject newNode = Instantiate(Nodeprefab, position, Quaternion.identity);
-                allNodes.InsertNodeAtEnd(newNode);
+                string[] coordinates = nodePositions[i].Split(',');
+                float xCoord = float.Parse(coordinates[0]);
+                float yCoord = float.Parse(coordinates[1]);
+                Vector2 position = new Vector2(xCoord, yCoord);
+                GameObject newNode = Instantiate(NodePrefab, position, Quaternion.identity);
+                allNodes[i] = newNode.GetComponent<NodeController>();
             }
         }
     }
 
     void CreateConnections()
     {
-        if (nodeConnectiontxt != null)
+        if (NodeConnectionText != null)
         {
-            string[] arrayNodeConnections = nodeConnectiontxt.text.Split('\n');
-            for (int i = 0; i < arrayNodeConnections.Length; i++)
+            string[] nodeConnections = NodeConnectionText.text.Split('\n');
+            for (int i = 0; i < nodeConnections.Length; i++)
             {
-                string connections = arrayNodeConnections[i];
-                string[] connectedNodes = connections.Split(',');
+                string[] connectedNodes = nodeConnections[i].Split(',');
 
-                int currentIndex = i; 
                 for (int j = 0; j < connectedNodes.Length; j++)
                 {
                     int connectedIndex = int.Parse(connectedNodes[j]);
-                    if (connectedIndex != currentIndex && connectedIndex < allNodes.length)
+                    if (connectedIndex != i && connectedIndex < allNodes.Length)
                     {
-                        GameObject currentNode = allNodes.ObtainNodeAtPosition(currentIndex);
-                        GameObject connectedNode = allNodes.ObtainNodeAtPosition(connectedIndex);
-                        currentNode.GetComponent<NodeController>().AddAdjacentNode(connectedNode);
+                        allNodes[i].AddAdjacentNode(allNodes[connectedIndex]);
                     }
                 }
             }
@@ -61,10 +60,10 @@ public class GraphControl : MonoBehaviour
 
     void SelectInitialNode()
     {
-        if (allNodes.length > 0)
+        if (allNodes.Length > 0)
         {
-            int index = Random.Range(0, allNodes.length);
-            Enemy.objective = allNodes.ObtainNodeAtPosition(index);
+            int index = Random.Range(0, allNodes.Length);
+            Enemy.objective = allNodes[index].gameObject;
         }
         else
         {
@@ -72,16 +71,5 @@ public class GraphControl : MonoBehaviour
         }
     }
 
-    void ModifyNodeCost()
-    {
-        if (allNodes.length >= 4)
-        {
-            allNodes.ObtainNodeAtPosition(2).GetComponent<NodeController>().energyCost = 3f;
-            allNodes.ObtainNodeAtPosition(3).GetComponent<NodeController>().energyCost = 5f;
-        }
-        else
-        {
-            Debug.LogWarning("No hay suficientes nodos para modificar los costos de energía.");
-        }
-    }
+   
 }

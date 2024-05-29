@@ -13,60 +13,40 @@ public class EnemyController : MonoBehaviour
     private bool followingPlayer = false;
     private Vector3 initialPosition;
     private float moveSpeed = 2f;
-
-    void Start()
+    private GameObject originalObjective;
+    private void Update()
     {
-        initialPosition = transform.position;
-    }
-
-    void Update()
-    {
-        if (followingPlayer && objective != null && !repos && energy > 0)
+        if (!repos && energy > 0 && objective != null)
         {
             transform.position = Vector2.SmoothDamp(transform.position, objective.transform.position, ref speedReference, 0.5f);
         }
-        else if (objective == null)
-        {
-            Debug.LogWarning("El objetivo no está asignado en el EnemyController.");
-        }
-        else
-        {
-            // Si no sigue al jugador, regresa al nodo inicial
-            transform.position = Vector3.MoveTowards(transform.position, initialPosition, moveSpeed * Time.deltaTime);
-            if (Vector3.Distance(transform.position, initialPosition) < 0.1f)
-            {
-                transform.position = initialPosition;
-            }
-        }
-    }
-
-    public void StartFollowingPlayer()
-    {
-        followingPlayer = true;
-        initialPosition = transform.position; 
-    }
-
-    public void ReturnToInitialNode()
-    {
-        followingPlayer = false;
-        objective = initialNode;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        NodeController nodeController = collision.gameObject.GetComponent<NodeController>();
-        if (nodeController != null)
+        if (collision.CompareTag("Player"))
         {
-            GameObject nextNode = nodeController.SelectNodeRandom();
-            if (nextNode != null)
+            objective = collision.gameObject;
+        }
+        else
+        {
+            NodeController nodeController = collision.gameObject.GetComponent<NodeController>();
+            if (nodeController != null)
             {
-                objective = nextNode;
+                objective = nodeController.SelectNodeRandom().gameObject;
                 energy -= nodeController.energyCost;
                 if (energy <= 0)
                 {
                     StartCoroutine(Rest());
                 }
             }
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            followingPlayer = false;
         }
     }
 

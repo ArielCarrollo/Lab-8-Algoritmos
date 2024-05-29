@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6609013527439848220}
   - component: {fileID: -4377069240393246167}
   - component: {fileID: 8059669444011799425}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Honguito (4)
   m_TagString: Node
   m_Icon: {fileID: 0}
@@ -143,4 +143,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 999cb52411a1f8f458a50dd841481596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  adjacentnodes: []
+  adjacentNodes: {fileID: 0}
+  energyCost: 1

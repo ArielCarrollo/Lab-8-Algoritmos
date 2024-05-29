@@ -4,25 +4,32 @@ using UnityEngine;
 
 public class NodeController : MonoBehaviour
 {
-    public SimplyLinkedList<GameObject> adjacentNodes = new SimplyLinkedList<GameObject>();
+    public NodeController[] adjacentNodes;
     public float energyCost = 1f;
 
-    public void AddAdjacentNode(GameObject node)
+    public void AddAdjacentNode(NodeController node)
     {
-        adjacentNodes.InsertNodeAtEnd(node);
+        for (int i = 0; i < adjacentNodes.Length; i++)
+        {
+            if (adjacentNodes[i] == null)
+            {
+                adjacentNodes[i] = node;
+                return;
+            }
+        }
+        Debug.LogWarning("No se puede agregar más nodos adyacentes, el array está lleno.");
     }
 
-    public GameObject SelectNodeRandom()
+    public NodeController SelectNodeRandom()
     {
-        if (adjacentNodes == null || adjacentNodes.length == 0)
+        if (adjacentNodes.Length == 0)
         {
-            return null; 
+            Debug.LogWarning("No hay nodos adyacentes.");
+            return null;
         }
-        else
-        {
-            int index = UnityEngine.Random.Range(0, adjacentNodes.length);
-            return adjacentNodes.ObtainNodeAtPosition(index);
-        }
+
+        int index = Random.Range(0, adjacentNodes.Length);
+        return adjacentNodes[index];
     }
 }
 
