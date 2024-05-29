@@ -65,10 +65,6 @@ public class GraphControl : MonoBehaviour
             int index = Random.Range(0, allNodes.Length);
             Enemy.objective = allNodes[index].gameObject;
         }
-        else
-        {
-            Debug.LogWarning("No se han creado nodos para seleccionar uno inicialmente.");
-        }
     }
 
    

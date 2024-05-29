@@ -24,7 +24,7 @@ public class NodeController : MonoBehaviour
     {
         if (adjacentNodes.Length == 0)
         {
-            Debug.LogWarning("No hay nodos adyacentes.");
+            Debug.LogWarning("No Existen papi.");
             return null;
         }
 

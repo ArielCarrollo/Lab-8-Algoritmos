@@ -45,7 +45,7 @@ public class DoubleLinkedList<T> : MonoBehaviour
     {
         if (position < 0 || position >= length)
         {
-            throw new System.Exception("Invalid position");
+            throw new System.Exception("Posicion no valida");
         }
 
         Node current = head;
